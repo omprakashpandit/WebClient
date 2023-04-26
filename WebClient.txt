@@ -1,0 +1,70 @@
+HTTP GET request
+================
+public Ticket getTicketInfo(String ticketId) {
+WebClient webClient = WebClient.create(); // get WeClient instance
+	 Ticket ticket = webClient.get() // represents HTTP GET request
+				  .uri(IRCTC_GET_TICKET_URL, ticketId) // ENDPOINT URL
+				  .accept(MediaType.APPLICATION_JSON)
+				  .retrieve() // take resp from response body
+				  .bodyToMono(Ticket.class) // bind resp body data to java obj
+				  .block(); // make sync call
+		 if(ticket!=null) { 
+			 return ticket;
+		 }
+
+		return null;
+}
+HTTP POST Request
+=================
+public Ticket processTicketBooking(Passenger passenger) {
+WebClient webClient = WebClient.create(); // get WeClient instance
+	 Ticket ticket = webClient.post()
+  				  .uri(IRCTC_BOOK_TICKET_URL)
+  				  .body(BodyInserters.fromValue(passenger))
+  				  .header("Content-Type","application/json")
+  				  .accept(MediaType.APPLICATION_JSON)
+  				  .retrieve()
+  				  .bodyToMono(Ticket.class)
+  				  .block();
+		 if(ticket!=null) { 
+			 return ticket;
+		 }
+		return null;
+	}
+String Response(Sync)
+=====================
+public void getTicketInfoSync(String ticketId) {
+System.out.println("Sync - method started....");
+	WebClient client = WebClient.create();
+		String response = client.get()
+					.uri(IRCTC_GET_TICKET_URL, ticketId)
+					.accept(MediaType.APPLICATION_JSON)
+					.retrieve()
+					.bodyToMono(String.class)
+					.block(); // wait for response
+			
+			System.out.println(response);
+			
+			System.out.println("Sync - method ended....");
+	}
+String Response(Async)
+=====================
+public void getTicketAsync(String ticketId) {
+		
+		System.out.println("Async method execution started.....");
+		
+		WebClient client = WebClient.create();
+		
+					client.get()
+						  .uri(IRCTC_GET_TICKET_URL, ticketId)
+						  .accept(MediaType.APPLICATION_JSON)
+						  .retrieve()
+						  .bodyToMono(String.class)
+						  .subscribe(response -> handleResponse(response));
+
+			System.out.println("Async method execution ended.....");
+	}
+	
+	public void handleResponse(String response) {
+		System.out.println(response);
+	}
